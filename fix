@@ -1,0 +1,43 @@
+print("Starting the Flask app...")
+
+from flask import Flask, request, jsonify
+import mysql.connector
+
+app = Flask(__name__)
+print("Flask app initialized")
+
+db = mysql.connector.connect(
+    host="127.0.0.1",
+    user="root",
+    password="pranshu",
+    database="payments_test_db"
+)
+cursor = db.cursor()
+print("Connected to MySQL")
+
+@app.route('/add-payment', methods=['POST'])
+def add_payment():
+    print("Received a POST request to /add-payment")
+    data = request.json
+    amount = data.get('amount')
+    date = data.get('date')
+    time = data.get('time')
+
+    if not all([amount, date, time]):
+        return jsonify({"error": "Missing data"}), 400
+
+    cursor.execute("INSERT INTO payments (amount, date, time) VALUES (%s, %s, %s)", (amount, date, time))
+    db.commit()
+    return jsonify({"message": "Payment added"}), 201
+
+@app.route('/get-payments', methods=['GET'])
+def get_payments():
+    print("Received a GET request to /get-payments")
+    cursor.execute("SELECT * FROM payments")
+    payments = cursor.fetchall()
+    return jsonify({"payments": payments})
+
+if __name__ == '__main__':
+    print("Running the app...")
+    app.run(debug=True)
+
