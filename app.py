@@ -7,7 +7,7 @@ app = Flask(__name__)
 print("Flask app initialized")
 
 # Get the PostgreSQL connection URL from environment variables (e.g., Render Dashboard)
-db_url = "postgresql://root:mgpCHqzRnwUJUCDmocaS2AE9NLttoeA2@dpg-cuh3rn23esus73fk81og-a.singapore-postgres.render.com/payments_nprg"
+db_url = os.getenv("DATABASE_URL", "postgresql://root:mgpCHqzRnwUJUCDmocaS2AE9NLttoeA2@dpg-cuh3rn23esus73fk81og-a.singapore-postgres.render.com/payments_nprg")
 
 # Connect to the PostgreSQL database
 conn = psycopg2.connect(db_url)
@@ -90,4 +90,4 @@ def get_payments():
 
 if __name__ == '__main__':
     print("Running the app...")
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=int(os.getenv("PORT", 10000)))
